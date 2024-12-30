@@ -51,12 +51,16 @@ useEffect(() => {
 
    const email = localStorage.getItem("username")
 //    console.log(email)
-   axios.get(`http://localhost:3000/api/v1/user/bulk?filter=${filter}`)
-    .then(response => {
-
-        const filteredUsers = response.data.users.filter((user) => user.username !== email)
-        setUsers(filteredUsers);
-    })
+   axios
+     .get(
+       `https://happay-backend.onrender.com/api/v1/user/bulk?filter=${filter}`
+     )
+     .then((response) => {
+       const filteredUsers = response.data.users.filter(
+         (user) => user.username !== email
+       );
+       setUsers(filteredUsers);
+     });
   
 },[filter])
 

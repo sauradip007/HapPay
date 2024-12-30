@@ -10,12 +10,15 @@ function Signup() {
     const navigate = useNavigate()
 async function onClickHandler(firstName, lastName,username,password) {
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/user/signup", {
-        username: email,
-        firstName: firstName,
-        lastName: lastName,
-        password: password,
-      });
+      const response = await axios.post(
+        "https://happay-backend.onrender.com/api/v1/user/signup",
+        {
+          username: email,
+          firstName: firstName,
+          lastName: lastName,
+          password: password,
+        }
+      );
 
       if (response.status === 201) {
         localStorage.setItem("token", response.data.token)

@@ -31,7 +31,7 @@ function UpdateMoney() {
        }
 
        const response = await axios.put(
-         "http://localhost:3000/api/v1/user",
+         "https://happay-backend.onrender.com/api/v1/user",
          updates,
          {
            headers: {

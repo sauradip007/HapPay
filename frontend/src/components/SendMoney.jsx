@@ -15,14 +15,15 @@ function SendMoney() {
         setError("");
     try {
          const response = await axios.post(
-           "http://localhost:3000/api/v1/account/transfer",
+           "https://happay-backend.onrender.com/api/v1/account/transfer",
            {
              toAccountId: id,
              amount: amount,
-           }, {
-                headers: {
-                    Authorization: "Bearer " + localStorage.getItem("tokenin")
-                }
+           },
+           {
+             headers: {
+               Authorization: "Bearer " + localStorage.getItem("tokenin"),
+             },
            }
          );
 

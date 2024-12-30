@@ -27,7 +27,7 @@ const Chart = () => {
     const fetchTransactions = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/api/v1/account/transactions",
+          "https://happay-backend.onrender.com/api/v1/account/transactions",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("tokenin")}`,
