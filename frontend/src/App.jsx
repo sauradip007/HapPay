@@ -34,10 +34,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 // export default App
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("tokenin")
-  );
+  const isLoggedIn = !!localStorage.getItem("tokenin");
 
+  // Protect multiple routes with shared auth check
   const ProtectedRoute = ({ children }) => {
     return isLoggedIn ? children : <Navigate to="/signin" />;
   };
@@ -45,54 +44,17 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={<Navigate to={isLoggedIn ? "/dashboard" : "/signin"} />}
-        />
+        <Route path="/" element={<Navigate to={isLoggedIn ? "/dashboard" : "/signin"} />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/signup" element={<Signup />} />
-        <Route
-          path="/signin"
-          element={<Signin setIsLoggedIn={setIsLoggedIn} />}
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/send"
-          element={
-            <ProtectedRoute>
-              <SendMoney />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/update"
-          element={
-            <ProtectedRoute>
-              <UpdateMoney />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/charts"
-          element={
-            <ProtectedRoute>
-              <Chart />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/signin" element={<Signin />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/send" element={<ProtectedRoute><SendMoney /></ProtectedRoute>} />
+        <Route path="/update" element={<ProtectedRoute><UpdateMoney /></ProtectedRoute>} />
+        <Route path="/charts" element={<ProtectedRoute><Chart /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
 }
 
-// In Signin.js, update state after login:
-setIsLoggedIn(true);
-localStorage.setItem("tokenin", token);
 export default App;
