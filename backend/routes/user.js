@@ -27,64 +27,129 @@ const signupSchema = z.object({
   firstName: z.string(),
   lastName: z.string().optional(),
 });
-router.post('/signup', async (req,res) => {
+// router.post('/signup', async (req,res) => {
 
 
-      try {
+//       try {
 
-        const validatedData = signupSchema.parse(req.body);
+//         const validatedData = signupSchema.parse(req.body);
+//     // Check if the email already exists
+//     const existingUser = await User.findOne({ username: validatedData.username });
+//     if (existingUser) {
+//       return res.status(411).json({ error: 'User already exists' });
+//     }
+
+//     // Hash the password
+//     const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+
+//         // Create a new user
+//     const newUser = new User({
+//       username: validatedData.username,
+//       firstName: validatedData.firstName,
+//       lastName: validatedData.lastName,
+//       password: hashedPassword,
+//     });
+
+
+//     await newUser.save();
+
+//    const randomBalance = Math.floor(Math.random() * 10000);
+
+//    // Create an account for the user
+//    const newAccount = new Account({
+//      userId: newUser._id,
+//      balance: randomBalance+1,
+//    });
+
+//    await newAccount.save();
+
+
+
+//     const userId = newUser._id
+
+//         const token = jwt.sign({ userId }, JWT_SECRET, {
+//           expiresIn: "1h",
+//         });
+    
+//     res.status(201).json({ message: 'User registered successfully',
+//     token:token
+//      });
+//   }
+//   catch (error) {
+
+//     if(error instanceof z.ZodError){
+//         return res.status(400).json({ error: error.errors });
+//       } 
+    
+//     res.status(500).json({ error: 'Internal server error' });
+//   } 
+// })
+
+
+router.post("/signup", async (req, res) => {
+  try {
+    // Validate the input
+    const validatedData = signupSchema.parse(req.body);
+
     // Check if the email already exists
-    const existingUser = await User.findOne({ username: validatedData.username });
+    const existingUser = await User.findOne({
+      username: validatedData.username,
+    });
     if (existingUser) {
-      return res.status(411).json({ error: 'User already exists' });
+      return res.status(409).json({ error: "User already exists" });
     }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(validatedData.password, 10);
 
-        // Create a new user
+    // Create a new user
     const newUser = new User({
       username: validatedData.username,
       firstName: validatedData.firstName,
-      lastName: validatedData.lastName,
+      lastName: validatedData.lastName || "", // Default to empty string if undefined
       password: hashedPassword,
     });
 
-
     await newUser.save();
 
-   const randomBalance = Math.floor(Math.random() * 10000);
+    // Generate a random balance
+    const randomBalance = Math.floor(Math.random() * 10000) + 1;
 
-   // Create an account for the user
-   const newAccount = new Account({
-     userId: newUser._id,
-     balance: randomBalance+1,
-   });
+    // Create an account for the user
+    const newAccount = new Account({
+      userId: newUser._id,
+      balance: randomBalance,
+    });
 
-   await newAccount.save();
+    await newAccount.save();
 
+    // Generate JWT token
+    const userId = newUser._id;
+    const token = jwt.sign({ userId }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
-
-    const userId = newUser._id
-
-        const token = jwt.sign({ userId }, JWT_SECRET, {
-          expiresIn: "1h",
-        });
+    res.status(201).json({
+      message: "User registered successfully",
+      token: token,
+    });
+  } catch (error) {
     
-    res.status(201).json({ message: 'User registered successfully',
-    token:token
-     });
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: error.errors });
+    }
+
+    // Log the error for debugging (not exposed to the client)
+    console.error("Error during signup:", error);
+
+    // Handle JWT or database errors more specifically if needed
+    if (error.name === "JsonWebTokenError") {
+      return res.status(500).json({ error: "Error generating token" });
+    }
+
+    res.status(500).json({ error: "Internal server error" });
   }
-  catch (error) {
-
-    if(error instanceof z.ZodError){
-        return res.status(400).json({ error: error.errors });
-      } 
-    
-    res.status(500).json({ error: 'Internal server error' });
-  } 
-})
-
+});
 
 
 const signinBody = z.object({
