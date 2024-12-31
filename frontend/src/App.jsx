@@ -1,5 +1,5 @@
-// import {Dashboard, SendMoney, Signin, Signup, UpdateMoney, Landing, Chart } from "./components";
-// import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import {Dashboard, SendMoney, Signin, Signup, UpdateMoney, Landing, Chart } from "./components";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 
 // function App() {
 //   const isLoggedIn = !!localStorage.getItem("tokenin") || ; // Check if the user is logged in
@@ -95,3 +95,4 @@ function App() {
 // In Signin.js, update state after login:
 setIsLoggedIn(true);
 localStorage.setItem("tokenin", token);
+export default App;
