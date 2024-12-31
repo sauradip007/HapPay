@@ -48,10 +48,10 @@ function App() {
         <Route path="/landing" element={<Landing />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<Signin />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/send" element={<ProtectedRoute><SendMoney /></ProtectedRoute>} />
-        <Route path="/update" element={<ProtectedRoute><UpdateMoney /></ProtectedRoute>} />
-        <Route path="/charts" element={<ProtectedRoute><Chart /></ProtectedRoute>} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/send" element={<SendMoney />} />
+        <Route path="/update" element={<UpdateMoney />} />
+        <Route path="/charts" element={<Chart />} />
       </Routes>
     </BrowserRouter>
   );
