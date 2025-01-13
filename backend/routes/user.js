@@ -27,63 +27,7 @@ const signupSchema = z.object({
   firstName: z.string(),
   lastName: z.string().optional(),
 });
-// router.post('/signup', async (req,res) => {
-
-
-//       try {
-
-//         const validatedData = signupSchema.parse(req.body);
-//     // Check if the email already exists
-//     const existingUser = await User.findOne({ username: validatedData.username });
-//     if (existingUser) {
-//       return res.status(411).json({ error: 'User already exists' });
-//     }
-
-//     // Hash the password
-//     const hashedPassword = await bcrypt.hash(validatedData.password, 10);
-
-//         // Create a new user
-//     const newUser = new User({
-//       username: validatedData.username,
-//       firstName: validatedData.firstName,
-//       lastName: validatedData.lastName,
-//       password: hashedPassword,
-//     });
-
-
-//     await newUser.save();
-
-//    const randomBalance = Math.floor(Math.random() * 10000);
-
-//    // Create an account for the user
-//    const newAccount = new Account({
-//      userId: newUser._id,
-//      balance: randomBalance+1,
-//    });
-
-//    await newAccount.save();
-
-
-
-//     const userId = newUser._id
-
-//         const token = jwt.sign({ userId }, JWT_SECRET, {
-//           expiresIn: "1h",
-//         });
-    
-//     res.status(201).json({ message: 'User registered successfully',
-//     token:token
-//      });
-//   }
-//   catch (error) {
-
-//     if(error instanceof z.ZodError){
-//         return res.status(400).json({ error: error.errors });
-//       } 
-    
-//     res.status(500).json({ error: 'Internal server error' });
-//   } 
-// })
+ 
 
 
 router.post("/signup", async (req, res) => {
@@ -251,35 +195,66 @@ router.put('/', authMiddleware, async(req, res) => {
 router.get('/bulk', async(req,res) => {
 
    try {
-     const { filter } = req.query; // Fetch the filter from query parameters
+     const { filter,page = 1, limit = 10 } = req.query; // Fetch the filter from query parameters
+     const skip = (page - 1) * limit;
+     let query = {}
+    //  let users;
+    //  if (!filter) {
+    //    // Fetch all records when no filter is provided
 
-     let users;
-     if (!filter) {
-       // Fetch all records when no filter is provided
-       users = await User.find({});
-     } else {
-       // Fetch records matching the filter
-       users = await User.find({
-         $or: [
-           { firstName: { $regex: filter, $options: "i" } },
-           { lastName: { $regex: filter, $options: "i" } },
-         ],
-       });
-     }
+       
+    //    users = await User.find({});
+    //  } else {
+    //    // Fetch records matching the filter
+    //    users = await User.find({
+    //      $or: [
+    //        { firstName: { $regex: filter, $options: "i" } },
+    //        { lastName: { $regex: filter, $options: "i" } },
+    //      ],
+    //    });
+    //  }
+
+
+    if (filter) {
+      query = {
+        $or: [
+          { firstName: { $regex: filter, $options: "i" } },
+          { lastName: { $regex: filter, $options: "i" } },
+        ],
+      };
+    }
+
+    // Fetch users with pagination
+    const users = await User.find(query).skip(skip).limit(parseInt(limit));
+
+    // Fetch total count for pagination metadata
+    const totalUsers = await User.countDocuments(query);
 
      if (!users || users.length === 0) {
        return res.status(404).json({ message: "No users found." });
      }
 
      // Map the users to include only necessary fields
-     res.status(200).json({
-       users: users.map((user) => ({
-         _id: user._id,
-         username: user.username,
-         firstName: user.firstName,
-         lastName: user.lastName,
-       })),
-     });
+    //  res.status(200).json({
+    //    users: users.map((user) => ({
+    //      _id: user._id,
+    //      username: user.username,
+    //      firstName: user.firstName,
+    //      lastName: user.lastName,
+    //    })),
+    //  });
+
+        res.status(200).json({
+          users: users.map((user) => ({
+            _id: user._id,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+          })),
+          totalUsers, // Total number of users matching the query
+          currentPage: parseInt(page), // Current page
+          totalPages: Math.ceil(totalUsers / limit), // Total pages
+        });
    } catch (error) {
      console.error("Error fetching users:", error.message);
      res.status(500).json({ message: "Internal server error." });
